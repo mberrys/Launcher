@@ -129,6 +129,7 @@ JsonDocument settings;
 std::vector<Option> options;
 
 #include "app_registry.h"
+#include "calculator.h"
 #include "display.h"
 #include "massStorage.h"
 #include "mykeyboard.h"
@@ -453,12 +454,12 @@ void loop() {
 #endif
         {
 #if (TFT_HEIGHT < 135) || (TFT_WIDTH < 135)
-         "PM"
+         "CALC"
 #else
-            "PMan"
+            "Calc"
 #endif
             ,
-         "Partition Manager.", [=]() { partList(); }
+         "Keyboard calculator.", [=]() { calculatorApp(); }
         },
         {
 #if (TFT_HEIGHT < 135) || (TFT_WIDTH < 135)

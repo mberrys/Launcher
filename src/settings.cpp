@@ -1,5 +1,6 @@
 
 #include "settings.h"
+#include "calculator.h"
 #include "display.h"
 #include "esp_mac.h"
 #include "idf/launcher_platform.h"
@@ -383,7 +384,7 @@ void settings_menu() {
                                askSpiffs = !askSpiffs;
                                saveConfigs();
                            }});
-        options.push_back({"Partition Manager", [=]() { partList(); }});
+        options.push_back({"Calculator", [=]() { calculatorApp(); }});
 #if defined(HAS_KEYBOARD)
         options.push_back({"Manage shortcuts", [=]() { manageKeyBindings(); }});
 #endif

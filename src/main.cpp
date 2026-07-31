@@ -42,12 +42,12 @@ uint16_t FGCOLOR = BLACK;
 uint16_t ALCOLOR = 0x8888;
 uint16_t BGCOLOR = WHITE;
 #else
-uint16_t FGCOLOR = GREEN;
-uint16_t ALCOLOR = RED;
+uint16_t FGCOLOR = 0xF81F; // magenta
+uint16_t ALCOLOR = 0x07FF; // cyan accent
 uint16_t BGCOLOR = BLACK;
 #endif
-uint16_t odd_color = 0x30c5;
-uint16_t even_color = 0x32e5;
+uint16_t odd_color = 0x8010;  // dark magenta (boot matrix)
+uint16_t even_color = 0xC618; // light magenta (boot matrix)
 
 int8_t _miso = SDCARD_MISO;
 int8_t _mosi = SDCARD_MOSI;

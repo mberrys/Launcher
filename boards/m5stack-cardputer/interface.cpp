@@ -11,6 +11,25 @@ Keyboard_Class Keyboard;
 Adafruit_TCA8418 tca;
 bool UseTCA8418 = false; // Set to true to use TCA8418 (Cardputer ADV)
 
+namespace {
+constexpr uint8_t ES8311_ADDR = 0x18;
+constexpr uint8_t ES8311_REG_DAC_MUTE = 0x31;
+constexpr uint8_t ES8311_REG_DAC_VOLUME = 0x32;
+
+bool es8311WriteReg(uint8_t reg, uint8_t value) {
+    Wire.beginTransmission(ES8311_ADDR);
+    Wire.write(reg);
+    Wire.write(value);
+    return Wire.endTransmission() == 0;
+}
+
+void muteCardputerAdvSpeaker() {
+    // Cardputer ADV routes key-click audio through the ES8311 codec; keep it off.
+    es8311WriteReg(ES8311_REG_DAC_VOLUME, 0x00);
+    es8311WriteReg(ES8311_REG_DAC_MUTE, 0x60);
+}
+} // namespace
+
 // Keyboard state variables
 bool fn_key_pressed = false;
 bool shift_key_pressed = false;
@@ -138,6 +157,7 @@ void _post_setup_gpio() {
 
     tca.matrix(7, 8);
     tca.flush();
+    muteCardputerAdvSpeaker();
     launcherGpioInput(11);
     // TCA8418 INT is active-low; only the falling edge means "event available".
     // FALLING avoids the spurious rising-edge ISR that fired after we cleared

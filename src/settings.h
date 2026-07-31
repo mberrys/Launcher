@@ -17,11 +17,11 @@ config.conf JSON structure
       "wui_usr":"admin",
       "wui_pwd":"launcher",
       "dwn_path": "/downloads/",
-      "FGCOLOR":2016,
+      "FGCOLOR":63519,
       "BGCOLOR":0,
-      "ALCOLOR":63488,
-      "even":13029,
-      "odd": 12485,
+      "ALCOLOR":2047,
+      "even":50712,
+      "odd": 32784,
       "wifi":[
          {
             "ssid":"myNetSSID",

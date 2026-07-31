@@ -8,7 +8,6 @@
 #include "nvs.h"
 #include "nvs_handle.hpp"
 #include "onlineLauncher.h"
-#include "partitioner.h"
 #include "powerSave.h"
 #include "sd_functions.h"
 #include "utils.h"

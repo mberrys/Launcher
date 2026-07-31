@@ -1,3 +1,11 @@
+# Tahiti
+
+Public codename for **Berry OS** — a Cardputer firmware fork of [M5Stack Launcher](https://github.com/bmorcelli/Launcher).
+
+> Berry OS is the planned 1.0 product name. This repo tracks early Tahiti development.
+
+---
+
 # Launcher
 Application launcher for M5Stack, Lilygo, CYD, Marauder, and ESP32 devices.
 

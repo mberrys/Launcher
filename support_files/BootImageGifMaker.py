@@ -5,10 +5,10 @@ import random
 # Configurações
 # WIDTH, HEIGHT = 440, 154
 WIDTH, HEIGHT = 440, 354
-FGCOLOR = (0, 255, 0)  # Verde
+FGCOLOR = (255, 0, 255)  # Magenta
 BGCOLOR = (0, 0, 0)    # Preto
-even_color = (25, 115, 25)  # Verde escuro
-odd_color = (20, 98, 20)    # Verde mais escuro
+even_color = (198, 24, 198)  # Magenta claro
+odd_color = (128, 0, 128)    # Magenta escuro
 LW, LH = 6, 10  # Largura e altura de caracteres
 frames = []
 
@@ -73,7 +73,7 @@ def update_frame_with_border(img, do_all=False, var_name=0):
     draw.text((WIDTH - (LW * 10) - t_width/2, HEIGHT - 25), name, fill=FGCOLOR, font=font_medium)
 
     t_width = draw.textlength(launcher_text,font=font_large)
-    draw.text((WIDTH // 2 - t_width/2, HEIGHT // 2 - 5*LH), launcher_text, fill=FGCOLOR, font=font_large, stroke_width=3, stroke_fill=(0,50,0))
+    draw.text((WIDTH // 2 - t_width/2, HEIGHT // 2 - 5*LH), launcher_text, fill=FGCOLOR, font=font_large, stroke_width=3, stroke_fill=(50,0,50))
 
     draw.rounded_rectangle(
         (width, width, WIDTH - width, HEIGHT - width),

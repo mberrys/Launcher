@@ -150,7 +150,7 @@ bool handleDelete(String &current_text, int &cursor_x, int &cursor_y) {
     tft->setCursor((cursor_x - fontSize * LW), cursor_y);
     tft->setTextColor(FGCOLOR, BGCOLOR);
     tft->print(" ");
-    tft->setTextColor(getComplementaryColor(BGCOLOR), 0x5AAB);
+    tft->setTextColor(getComplementaryColor(BGCOLOR), 0x4008);
     tft->setCursor(cursor_x - fontSize * LW, cursor_y);
     cursor_x = tft->getCursorX();
     cursor_y = tft->getCursorY();

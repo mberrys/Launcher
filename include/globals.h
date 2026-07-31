@@ -127,6 +127,11 @@ extern volatile bool DownPress;
 extern volatile bool SelPress;
 extern volatile bool EscPress;
 extern volatile bool AnyKeyPress;
+// True for as long as the `opt` key is physically held down (Cardputer only, set
+// by the board InputHandler). Unlike the flags above this is a level, not an
+// edge: it is never consumed by check() and resetGlobals() deliberately leaves it
+// alone, so releasing the key is what clears it. See src/help_overlay.h.
+extern volatile bool OptHeld;
 
 inline void resetGlobals(void) {
     NextPress = false;

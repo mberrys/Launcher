@@ -1,6 +1,7 @@
 
 #include "massStorage.h"
 #include "display.h"
+#include "help_overlay.h"
 #include "idf/launcher_platform.h"
 #include "sd_functions.h"
 #ifdef SOC_USB_OTG_SUPPORTED
@@ -271,7 +272,13 @@ void MassStorage::setup() {
 }
 
 void MassStorage::loop() {
-    while (!check(EscPress) && !shouldStop) yield();
+    HelpScope help(kHelpMassStorage);
+    while (!check(EscPress) && !shouldStop) {
+        // The mount-state icon is only repainted on a change, so put it back
+        // ourselves once the help panel comes down.
+        if (helpOverlayCheck()) drawUSBStickIcon(s_usbMounted);
+        yield();
+    }
 }
 
 void MassStorage::beginUsb() {

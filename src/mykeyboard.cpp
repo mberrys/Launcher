@@ -1,5 +1,6 @@
 #include "mykeyboard.h"
 #include "display.h"
+#include "help_overlay.h"
 #include "idf/launcher_platform.h"
 #include "powerSave.h"
 #include "settings.h"
@@ -361,7 +362,14 @@ String generalKeyboard(
 #endif
 
     // main loop
+    HelpScope help(kHelpTextInput);
     while (1) {
+        if (helpOverlayCheck()) {
+            // The top button row is only repainted when the selection moved off it,
+            // so nudge old_y to force it back after the help panel cleared the screen.
+            old_y = -1;
+            redraw = true;
+        }
         if (redraw) {
             // setup
             tft->setCursor(0, 0);

@@ -4,6 +4,7 @@
 #include "display.h"
 #include "esp_ota_ops.h"
 #include "esp_task_wdt.h"
+#include "help_overlay.h"
 #include "idf/idf_update.h"
 #include "idf/idf_web_server.h"
 #include "idf/idf_wifi.h"
@@ -1993,12 +1994,10 @@ String readLineFromFile(File myFile) {
     return line;
 }
 
-void startWebUiLoopCommon(bool mode_ap) {
-    String txt;
-    if (!mode_ap) txt = launcherWifiLocalIp().c_str();
-    else txt = launcherWifiApIp().c_str();
-
 #ifndef HEADLESS
+// Split out of startWebUiLoopCommon so it can be painted again after the `opt`
+// help panel is dismissed.
+static void drawWebUiScreen(const String &txt) {
     tft->drawRoundRect(5, 5, tftWidth - 10, tftHeight - 10, 5, ALCOLOR);
     tft->fillRoundRect(6, 6, tftWidth - 12, tftHeight - 12, 5, BGCOLOR);
     setTftDisplay(7, 7, ALCOLOR, FP, BGCOLOR);
@@ -2018,8 +2017,20 @@ void startWebUiLoopCommon(bool mode_ap) {
     setTftDisplay(7, tftHeight - 39, ALCOLOR, FP);
     tft->drawCentreString("press Sel to stop", tftWidth / 2, tftHeight - 15, 1);
     tft->display(false);
+}
+#endif
 
+void startWebUiLoopCommon(bool mode_ap) {
+    String txt;
+    if (!mode_ap) txt = launcherWifiLocalIp().c_str();
+    else txt = launcherWifiApIp().c_str();
+
+#ifndef HEADLESS
+    drawWebUiScreen(txt);
+
+    HelpScope help(kHelpWebUi);
     while (!check(SelPress)) {
+        if (helpOverlayCheck()) drawWebUiScreen(txt);
 #else
     launcherConsolePrintln("Access: http://launcher.local");
     launcherConsolePrintf("IP %s\n", txt.c_str());

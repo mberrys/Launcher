@@ -54,6 +54,12 @@ char getKeyChar(uint8_t row, uint8_t col) {
 int handleSpecialKeys(uint8_t row, uint8_t col, bool pressed) {
     char keyVal = _key_value_map[row][col].value_first;
     switch (keyVal) {
+        case KEY_OPT:
+            // `opt` is the keyboard-help modifier (see src/help_overlay.h). Claiming
+            // it here also stops its 0x00 key value being pushed into KeyStroke.word
+            // as a stray NUL by the default branch below.
+            OptHeld = pressed;
+            return 1;
         case 0xFF:
             fn_key_pressed = pressed;
             if (fn_key_pressed) launcherConsolePrintf("%s\n", String("FN Pressed").c_str());
@@ -396,6 +402,7 @@ void InputHandler(void) {
         Keyboard.update();
         if (!Keyboard.isPressed()) {
             KeyStroke.Clear();
+            OptHeld = false;
             LongPressTmp = false;
             return;
         }
@@ -406,6 +413,7 @@ void InputHandler(void) {
 
         keyStroke key;
         Keyboard_Class::KeysState status = Keyboard.keysState();
+        OptHeld = status.opt; // keyboard-help modifier, see src/help_overlay.h
         for (auto i : status.hid_keys) key.hid_keys.push_back(i);
         for (auto i : status.word) {
             key.word.push_back(i);

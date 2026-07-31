@@ -1,5 +1,6 @@
 #include "calculator.h"
 #include "display.h"
+#include "help_overlay.h"
 #include "mykeyboard.h"
 #include "powerSave.h"
 #include <cmath>
@@ -194,7 +195,9 @@ void calculatorApp() {
     String error;
     bool redraw = true;
 
+    HelpScope help(kHelpCalculator);
     while (!returnToMenu) {
+        if (helpOverlayCheck()) redraw = true;
         if (redraw) {
             drawCalculatorUi(expression, resultLine, error);
             redraw = false;

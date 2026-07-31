@@ -64,6 +64,7 @@ volatile bool DownPress = false;
 volatile bool SelPress = false;
 volatile bool EscPress = false;
 volatile bool AnyKeyPress = false;
+volatile bool OptHeld = false;
 LTouchPoint touchPoint;
 keyStroke KeyStroke;
 
@@ -131,6 +132,7 @@ std::vector<Option> options;
 #include "app_registry.h"
 #include "calculator.h"
 #include "display.h"
+#include "help_overlay.h"
 #include "massStorage.h"
 #include "mykeyboard.h"
 #include "onlineLauncher.h"
@@ -299,8 +301,12 @@ void setup() {
     std::vector<LauncherAppMetadata> bootApps = launcherListInstalledApps();
 #endif
 
+    helpPushScreen(&kHelpBoot);
     while (launcherMillis() < i + (2000 + bootToApp * 3000)) { // increased from 2500 to 5000
-        initDisplay();                                         // Inicia o display
+        // The bootscreen repaints itself every pass, so it needs no redraw flag of
+        // its own after the help panel comes down.
+        helpOverlayCheck();
+        initDisplay(); // Inicia o display
 
         if (launcherMillis() > (i + j * 500)) { // Serial message each ~500ms
             launcherConsolePrintln("Press the button to enter the Launcher!");
@@ -383,6 +389,7 @@ void setup() {
 // If M5 or Enter button is pressed, continue from here
 Launcher:
     RAM_LOG("launcher-label");
+    helpPopScreen(); // balances the push before the bootscreen loop
     LongPress = false;
     tft->fillScreen(BGCOLOR);
 #if LED > 0 && defined(HEADLESS)
@@ -501,7 +508,9 @@ void loop() {
 #endif
     opt = menuItems.size(); // number of options in the menu
     update_sd = sdcardMounted;
+    HelpScope help(kHelpHome);
     while (1) {
+        if (helpOverlayCheck()) redraw = true;
         if (redraw) {
             if (update_sd != sdcardMounted) {
                 for (auto o : menuItems) {

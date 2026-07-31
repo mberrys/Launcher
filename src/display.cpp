@@ -1,6 +1,7 @@
 #include "display.h"
 #include "app_registry.h"
 #include "cardkb2.h"
+#include "help_overlay.h"
 #include "idf/idf_wifi.h"
 #include "idf/launcher_platform.h"
 #include "mykeyboard.h"
@@ -1063,9 +1064,13 @@ void drawBatteryStatus(uint8_t bat) {
 **  Function: loopOptions
 **  Where you choose among the options in menu
 **********************************************************************/
-int loopOptions(std::vector<Option> &options, bool bright, uint16_t al, uint16_t bg, bool border, int index) {
+int loopOptions(
+    std::vector<Option> &options, bool bright, uint16_t al, uint16_t bg, bool border, int index,
+    const HelpScreen *help
+) {
     bool redraw = true;
     bool exit = false;
+    HelpScope helpScope(help ? *help : kHelpListMenu);
 #if defined(HAS_TOUCH)
     bool escRequested = false; // set only by the explicit [ESC] label (touch, border==false)
 #endif
@@ -1077,6 +1082,7 @@ int loopOptions(std::vector<Option> &options, bool bright, uint16_t al, uint16_t
     int min_idx = 255;
     LongPressTmp = launcherMillis();
     while (1) {
+        if (helpOverlayCheck()) redraw = true;
         if (redraw) {
             list = {};
             coord = drawOptions(index, options, list, al, bg, border);
@@ -1238,8 +1244,10 @@ void loopVersions(const String &_fid) {
     bool redraw = true;
 
     LongPressTmp = launcherMillis();
+    HelpScope help(kHelpVersionPicker);
     while (1) {
         if (returnToMenu) break; // Stops the loop to get back to Main menu
+        if (helpOverlayCheck()) redraw = true;
 
         JsonObject Version = versions[versionIndex];
         const char *version = Version["version"];
@@ -1424,7 +1432,7 @@ RESTART:
     options.push_back({"[Main Menu]", [=]() { returnToMenu = true; }, ALCOLOR});
 
     tft->fillScreen(BGCOLOR);
-    index = loopOptions(options, false, FGCOLOR, BGCOLOR, false, index);
+    index = loopOptions(options, false, FGCOLOR, BGCOLOR, false, index, &kHelpFirmwareList);
     if (currentIndex >= 0) loopVersions(doc["items"][currentIndex]["fid"].as<String>());
     if (refine) {
         refine = false;

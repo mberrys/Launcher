@@ -3,6 +3,7 @@
 #include "calculator.h"
 #include "display.h"
 #include "esp_mac.h"
+#include "help_overlay.h"
 #include "idf/launcher_platform.h"
 #include "mykeyboard.h"
 #include "nvs.h"
@@ -403,7 +404,7 @@ void settings_menu() {
 #endif
 
         options.push_back({"Main Menu", [=]() { returnToMenu = true; }});
-        idx = loopOptions(options);
+        idx = loopOptions(options, false, RED, BLACK, true, 0, &kHelpSettings);
     }
     tft->drawPixel(0, 0, 0);
     tft->fillScreen(BGCOLOR);

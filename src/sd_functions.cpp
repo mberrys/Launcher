@@ -2,6 +2,7 @@
 #include "backup_manager.h"
 #include "display.h"
 #include "esp_log.h"
+#include "help_overlay.h"
 #include "idf/idf_update.h"
 #include "idf/launcher_platform.h"
 #include "install_shared.h"
@@ -353,7 +354,7 @@ RESTART:
         bkf = false;
         read_fs = false;
     }
-    index = loopOptions(options, false, FGCOLOR, BGCOLOR, false, index);
+    index = loopOptions(options, false, FGCOLOR, BGCOLOR, false, index, &kHelpSdBrowser);
     // First Exit
     if (index < 0) goto BACK_FOLDER;
     // Check if it is Folder or operator (> Back)

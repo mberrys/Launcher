@@ -20,9 +20,14 @@ extern Ard_eSPI *tft;
 
 #define FREE_TFT delete tft;
 
+struct HelpScreen;
+
+// `help` names the screen the `opt` cheat sheet should describe while this menu is
+// up. Leave it null and the generic list-menu controls are shown, which is the
+// right answer for most pop-ups.
 int loopOptions(
     std::vector<Option> &options, bool bright = false, uint16_t al = RED, uint16_t bg = BLACK,
-    bool border = true, int index = 0
+    bool border = true, int index = 0, const HelpScreen *help = nullptr
 );
 void loopVersions(const String &fid);
 void loopFirmware(bool isUpdate = false);

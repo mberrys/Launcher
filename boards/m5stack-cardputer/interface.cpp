@@ -11,6 +11,25 @@ Keyboard_Class Keyboard;
 Adafruit_TCA8418 tca;
 bool UseTCA8418 = false; // Set to true to use TCA8418 (Cardputer ADV)
 
+namespace {
+constexpr uint8_t ES8311_ADDR = 0x18;
+constexpr uint8_t ES8311_REG_DAC_MUTE = 0x31;
+constexpr uint8_t ES8311_REG_DAC_VOLUME = 0x32;
+
+bool es8311WriteReg(uint8_t reg, uint8_t value) {
+    Wire.beginTransmission(ES8311_ADDR);
+    Wire.write(reg);
+    Wire.write(value);
+    return Wire.endTransmission() == 0;
+}
+
+void muteCardputerAdvSpeaker() {
+    // Cardputer ADV routes key-click audio through the ES8311 codec; keep it off.
+    es8311WriteReg(ES8311_REG_DAC_VOLUME, 0x00);
+    es8311WriteReg(ES8311_REG_DAC_MUTE, 0x60);
+}
+} // namespace
+
 // Keyboard state variables
 bool fn_key_pressed = false;
 bool shift_key_pressed = false;
@@ -35,6 +54,12 @@ char getKeyChar(uint8_t row, uint8_t col) {
 int handleSpecialKeys(uint8_t row, uint8_t col, bool pressed) {
     char keyVal = _key_value_map[row][col].value_first;
     switch (keyVal) {
+        case KEY_OPT:
+            // `opt` is the keyboard-help modifier (see src/help_overlay.h). Claiming
+            // it here also stops its 0x00 key value being pushed into KeyStroke.word
+            // as a stray NUL by the default branch below.
+            OptHeld = pressed;
+            return 1;
         case 0xFF:
             fn_key_pressed = pressed;
             if (fn_key_pressed) launcherConsolePrintf("%s\n", String("FN Pressed").c_str());
@@ -138,6 +163,7 @@ void _post_setup_gpio() {
 
     tca.matrix(7, 8);
     tca.flush();
+    muteCardputerAdvSpeaker();
     launcherGpioInput(11);
     // TCA8418 INT is active-low; only the falling edge means "event available".
     // FALLING avoids the spurious rising-edge ISR that fired after we cleared
@@ -376,6 +402,7 @@ void InputHandler(void) {
         Keyboard.update();
         if (!Keyboard.isPressed()) {
             KeyStroke.Clear();
+            OptHeld = false;
             LongPressTmp = false;
             return;
         }
@@ -386,6 +413,7 @@ void InputHandler(void) {
 
         keyStroke key;
         Keyboard_Class::KeysState status = Keyboard.keysState();
+        OptHeld = status.opt; // keyboard-help modifier, see src/help_overlay.h
         for (auto i : status.hid_keys) key.hid_keys.push_back(i);
         for (auto i : status.word) {
             key.word.push_back(i);

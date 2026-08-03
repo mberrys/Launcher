@@ -1,6 +1,7 @@
 #include "app_registry.h"
 #include "backup_manager.h"
 #include "display.h"
+#include "help_overlay.h"
 #include "idf/launcher_platform.h"
 #include "mykeyboard.h"
 #include "settings.h"
@@ -594,7 +595,7 @@ void launcherShowAppActions(const char *label) {
                           }});
     appOptions.push_back({"Cancel", []() {}});
 
-    loopOptions(appOptions);
+    loopOptions(appOptions, false, RED, BLACK, true, 0, &kHelpAppActions);
 }
 
 void launcherShowAppLauncher() {

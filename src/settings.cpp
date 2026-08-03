@@ -1,13 +1,14 @@
 
 #include "settings.h"
+#include "calculator.h"
 #include "display.h"
 #include "esp_mac.h"
+#include "help_overlay.h"
 #include "idf/launcher_platform.h"
 #include "mykeyboard.h"
 #include "nvs.h"
 #include "nvs_handle.hpp"
 #include "onlineLauncher.h"
-#include "partitioner.h"
 #include "powerSave.h"
 #include "sd_functions.h"
 #include "utils.h"
@@ -383,7 +384,7 @@ void settings_menu() {
                                askSpiffs = !askSpiffs;
                                saveConfigs();
                            }});
-        options.push_back({"Partition Manager", [=]() { partList(); }});
+        options.push_back({"Calculator", [=]() { calculatorApp(); }});
 #if defined(HAS_KEYBOARD)
         options.push_back({"Manage shortcuts", [=]() { manageKeyBindings(); }});
 #endif
@@ -403,7 +404,7 @@ void settings_menu() {
 #endif
 
         options.push_back({"Main Menu", [=]() { returnToMenu = true; }});
-        idx = loopOptions(options);
+        idx = loopOptions(options, false, RED, BLACK, true, 0, &kHelpSettings);
     }
     tft->drawPixel(0, 0, 0);
     tft->fillScreen(BGCOLOR);
@@ -506,11 +507,11 @@ void setUiColor() {
     options = {
         {"Default",
          [&]() {
-             FGCOLOR = 0x07E0;
+             FGCOLOR = 0xF81F;
              BGCOLOR = 0x0000;
-             ALCOLOR = 0xF800;
-             odd_color = 0x30c5;
-             even_color = 0x32e5;
+             ALCOLOR = 0x07FF;
+             odd_color = 0x8010;
+             even_color = 0xC618;
          }                 },
         {"Red",
          [&]() {
@@ -746,11 +747,11 @@ void defaultValues() {
     odd_color = 0x5555;
     even_color = 0x2222;
 #else
-    FGCOLOR = 0x07E0;
+    FGCOLOR = 0xF81F;
     BGCOLOR = 0x0000;
-    ALCOLOR = 0xF800;
-    odd_color = 0x30c5;
-    even_color = 0x32e5;
+    ALCOLOR = 0x07FF;
+    odd_color = 0x8010;
+    even_color = 0xC618;
 #endif
     dev_mode = false;
     wui_usr = "admin";

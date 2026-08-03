@@ -42,12 +42,12 @@ uint16_t FGCOLOR = BLACK;
 uint16_t ALCOLOR = 0x8888;
 uint16_t BGCOLOR = WHITE;
 #else
-uint16_t FGCOLOR = GREEN;
-uint16_t ALCOLOR = RED;
+uint16_t FGCOLOR = 0xF81F; // magenta
+uint16_t ALCOLOR = 0x07FF; // cyan accent
 uint16_t BGCOLOR = BLACK;
 #endif
-uint16_t odd_color = 0x30c5;
-uint16_t even_color = 0x32e5;
+uint16_t odd_color = 0x8010;  // dark magenta (boot matrix)
+uint16_t even_color = 0xC618; // light magenta (boot matrix)
 
 int8_t _miso = SDCARD_MISO;
 int8_t _mosi = SDCARD_MOSI;
@@ -64,6 +64,7 @@ volatile bool DownPress = false;
 volatile bool SelPress = false;
 volatile bool EscPress = false;
 volatile bool AnyKeyPress = false;
+volatile bool OptHeld = false;
 LTouchPoint touchPoint;
 keyStroke KeyStroke;
 
@@ -129,7 +130,9 @@ JsonDocument settings;
 std::vector<Option> options;
 
 #include "app_registry.h"
+#include "calculator.h"
 #include "display.h"
+#include "help_overlay.h"
 #include "massStorage.h"
 #include "mykeyboard.h"
 #include "onlineLauncher.h"
@@ -298,8 +301,12 @@ void setup() {
     std::vector<LauncherAppMetadata> bootApps = launcherListInstalledApps();
 #endif
 
+    helpPushScreen(&kHelpBoot);
     while (launcherMillis() < i + (2000 + bootToApp * 3000)) { // increased from 2500 to 5000
-        initDisplay();                                         // Inicia o display
+        // The bootscreen repaints itself every pass, so it needs no redraw flag of
+        // its own after the help panel comes down.
+        helpOverlayCheck();
+        initDisplay(); // Inicia o display
 
         if (launcherMillis() > (i + j * 500)) { // Serial message each ~500ms
             launcherConsolePrintln("Press the button to enter the Launcher!");
@@ -382,6 +389,7 @@ void setup() {
 // If M5 or Enter button is pressed, continue from here
 Launcher:
     RAM_LOG("launcher-label");
+    helpPopScreen(); // balances the push before the bootscreen loop
     LongPress = false;
     tft->fillScreen(BGCOLOR);
 #if LED > 0 && defined(HEADLESS)
@@ -453,12 +461,12 @@ void loop() {
 #endif
         {
 #if (TFT_HEIGHT < 135) || (TFT_WIDTH < 135)
-         "PM"
+         "CALC"
 #else
-            "PMan"
+            "Calc"
 #endif
             ,
-         "Partition Manager.", [=]() { partList(); }
+         "Keyboard calculator.", [=]() { calculatorApp(); }
         },
         {
 #if (TFT_HEIGHT < 135) || (TFT_WIDTH < 135)
@@ -500,7 +508,9 @@ void loop() {
 #endif
     opt = menuItems.size(); // number of options in the menu
     update_sd = sdcardMounted;
+    HelpScope help(kHelpHome);
     while (1) {
+        if (helpOverlayCheck()) redraw = true;
         if (redraw) {
             if (update_sd != sdcardMounted) {
                 for (auto o : menuItems) {
